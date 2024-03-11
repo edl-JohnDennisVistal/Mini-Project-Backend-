@@ -43,8 +43,37 @@ class User extends Authenticatable implements JWTSubject
      * @var array<string, string>
      */
 
+    public function authorizeRoles($roles){
+        if ($this->hasAnyRole($roles)) {
+            return true;
+        }
+        abort(401, 'This action is unauthorized.');
+    }
+
+    public function hasAnyRole($roles){
+        if (is_array($roles)) {
+            foreach ($roles as $role) {
+                if ($this->hasRole($role)) {
+                    return true;
+                }
+            }
+        } else {
+            if ($this->hasRole($roles)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public function roles(){
         return $this->belongsToMany(Role::class, 'users_has_roles', 'users_id', 'roles_id');
+    }
+
+    public function hasRole($role){
+        if ($this->roles()->where('role', $role)->first()) {
+            return true;
+        }
+        return false;
     }
 
     protected $casts = [

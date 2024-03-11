@@ -20,21 +20,35 @@ use App\Http\Controllers\Skills;
 |
 */
 
-Route::post('auth/register', [Users::class,'register']);
-Route::post('auth/update/registered/data', [Users::class,'updateRegistration']);
+ 
+/** 
+ *  Routes that does not require authentication
+**/
 Route::post('auth/login', [Users::class,'login']);
+Route::post('auth/register', [Users::class,'register']);
 
-Route::post('auth/add/user/details', [UserDetails::class,'insertUserDetails']);             
-Route::post('auth/update/user/details', [UserDetails::class,'updateUserDetails']);  
 
-Route::post('auth/add/project', [Projects::class,'createProject']);   
-Route::post('auth/update/project', [Projects::class,'updateProject']);   
+/** 
+ *  Protected by JWT Authentication
+**/
+Route::middleware(['auth:api'])->group(function () {
+    /** 
+     *  Users priveleges. Modefy their own details and skills
+    **/
+    Route::post('auth/update/registered/data', [Users::class,'updateRegistration']);
+    Route::post('auth/add/user/details', [UserDetails::class,'insertUserDetails']);             
+    Route::post('auth/update/user/details', [UserDetails::class,'updateUserDetails']); 
+    Route::get('auth/logout', [Users::class,'logout']);
 
-Route::post('auth/add/skill', [Skills::class,'addSkill']);   
-Route::post('auth/update/skill', [Skills::class,'updateSkill']);   
-Route::post('auth/remove/skill', [Skills::class,'removeSkill']);   
+    /** 
+     *  Admin rights
+    **/
+    /* Skills */
+    Route::post('auth/add/skill', [Skills::class,'addSkill'])->middleware('role:ROLE_ADMIN');  
+    Route::post('auth/update/skill', [Skills::class,'updateSkill'])->middleware('role:ROLE_ADMIN');   
+    Route::post('auth/remove/skill', [Skills::class,'removeSkill'])->middleware('role:ROLE_ADMIN');  
+    /* Projects */
+    Route::post('auth/add/project', [Projects::class,'createProject'])->middleware('role:ROLE_ADMIN');   
+    Route::post('auth/update/project', [Projects::class,'updateProject'])->middleware('role:ROLE_ADMIN');  
 
-Route::get('auth/logout', [Users::class,'logout'])->middleware('auth:api');
-
-Route::get('hello', [TestController::class,'hello']);
-Route::get('privatehello', [TestController::class,'privatehello'])->middleware('auth:api');
+});
