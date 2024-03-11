@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class DatabaseSeeder extends Seeder
 {
@@ -12,11 +13,20 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // \App\Models\User::factory(10)->create();
-
-        // \App\Models\User::factory()->create([
-        //     'name' => 'Test User',
-        //     'email' => 'test@example.com',
-        // ]);
+        DB::table('roles')->insert([
+            'role' => 'ROLE_ADMIN',
+            'created_at' => new \DateTime,
+            'updated_at' => new \DateTime
+        ]);
+        DB::table('roles')->insert([
+            'role' => 'ROLE_SUPERVISOR',
+            'created_at' => new \DateTime,
+            'updated_at' => new \DateTime
+        ]);
+        DB::table('roles')->insert([
+            'role' => 'ROLE_BASIC',
+            'created_at' => new \DateTime,
+            'updated_at' => new \DateTime
+        ]);
     }
 }

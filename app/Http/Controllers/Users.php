@@ -7,6 +7,7 @@ use App\Http\Requests\RegistrationValidation;
 use App\Http\Requests\UserDetailsValidation;
 use App\Http\Requests\LoginValidation;
 use App\Models\User;
+use App\Models\Role;
 
 /** 
  *   Docu: This class is for user related processes.
@@ -16,11 +17,17 @@ class Users extends Controller{
      *   Registers a new user.
      *   Validates the form data using RegistrationValidation class.
      *   Returns the user object.
+     *   Sets Role for the user.
     **/
     public function register(RegistrationValidation $request){
         $validatedData = $request->validated();
         $user = User::create($validatedData);
-        return $user;
+        $role = Role::where('role', $request->input('role'))->first();
+        if ($user && $role) {
+            $user->roles()->attach($role);
+            return $user;
+        }
+        return "Something went wrong. Please try again. Role or User not found.";
     }
     /**  
      *   Update the regestration data.
