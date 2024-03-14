@@ -35,14 +35,14 @@ Route::middleware(['auth:api'])->group(function () {
     /** 
      *  Users priveleges. Modefy their own details and skills
     **/
-    Route::post('auth/update/registered/data', [Users::class,'updateRegistration']);
-    Route::post('auth/add/user/details', [UserDetails::class,'insertUserDetails']);             
-    Route::post('auth/update/user/details', [UserDetails::class,'updateUserDetails']); 
-    Route::get('auth/logout', [Users::class,'logout']);
-
+    Route::post('auth/update/registered/data', [Users::class,'updateRegistration']);    
+    Route::post('auth/add/user/details', [UserDetails::class,'insertUserDetails']);               
+    Route::post('auth/update/user/details', [UserDetails::class,'updateUserDetails']);  
+    Route::get('auth/user/details/{id}', [UserDetails::class,'fetchUserDetails']); 
+    Route::get('auth/logout', [Users::class,'logout']);     
     /** 
      *  Admin rights
-    **/
+     **/
     /* Skills */
     Route::post('auth/add/skill', [Skills::class,'addSkill'])->middleware('role:ROLE_ADMIN');  
     Route::post('auth/update/skill', [Skills::class,'updateSkill'])->middleware('role:ROLE_ADMIN');   
@@ -50,5 +50,7 @@ Route::middleware(['auth:api'])->group(function () {
     /* Projects */
     Route::post('auth/add/project', [Projects::class,'createProject'])->middleware('role:ROLE_ADMIN');   
     Route::post('auth/update/project', [Projects::class,'updateProject'])->middleware('role:ROLE_ADMIN');  
-
+    /* Users */
+    Route::get('auth/admin-panel/{id}', [Users::class,'fetchUsers'])->middleware('role:ROLE_ADMIN');  
+    Route::get('auth/admin-panel/delete/{id}', [Users::class,'deleteUser'])->middleware('role:ROLE_ADMIN');  
 });

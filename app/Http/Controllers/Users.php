@@ -8,6 +8,7 @@ use App\Http\Requests\UserDetailsValidation;
 use App\Http\Requests\LoginValidation;
 use App\Models\User;
 use App\Models\Role;
+use App\Models\UserDetail;
 
 /** 
  *   Docu: This class is for user related processes.
@@ -21,13 +22,25 @@ class Users extends Controller{
     **/
     public function register(RegistrationValidation $request){
         $validatedData = $request->validated();
-        $user = User::create($validatedData);
+        $user = User::create([
+            'username' => $validatedData['username'], 
+            'password' => bcrypt($validatedData['password']),
+        ]);
+        $userDetails = UserDetail::create([
+            'user_id' => $user->id,
+            'first_name' => $validatedData['first_name'],
+            'last_name' => $validatedData['last_name'],
+            'date_of_birth' => date("F d, Y", strtotime($validatedData['date_of_birth'])),
+            'gender' => $validatedData['gender'],
+            'email' => $validatedData['email'],
+            'age' => $validatedData['age'],   
+        ]);
         $role = Role::where('role', $request->input('role'))->first();
         if ($user && $role) {
             $user->roles()->attach($role);
-            return $user;
+            return response()->json(['message' => 'User created successfully'], 201); 
         }
-        return "Something went wrong. Please try again. Role or User not found.";
+        return response()->json(['message' => 'Something went wrong. Please try again. Role or User not found.'], 500); 
     }
     /**  
      *   Update the regestration data.
@@ -49,14 +62,17 @@ class Users extends Controller{
     public function login(LoginValidation $request){
         $validatedData = $request->validated();
         if(! $token = auth('api')->attempt([
-            'email' => $validatedData['email'], 
+            'username' => $validatedData['username'], 
             'password' => $validatedData['password']
         ])){
             return response()->json([
-                'message' => 'invalid email or password'
+                'message' => 'Invalid username or password'
             ],401);
         }
-        return $this->respondWithToken($token);
+        return $this->respondWithToken([
+            'token' => $token,
+            'user' => auth('api')->user()
+        ]);
     }
     /**  
      *   Logs out a user.
@@ -70,6 +86,36 @@ class Users extends Controller{
     }  
     public function insertUserDetails(UserDetailsValidation $request){
         
+    }
+    /** 
+     *   For admin users only.
+    **/
+    public function fetchUsers($id){
+        $users = User::where('id', '!=', $id)->with('userDetails', 'roles', 'projects')->get()->toArray();
+        $data = [];
+        if( isset($users) && !empty($users) ){
+            foreach ($users as $key => $value) {
+                $data[] = [
+                    'id' => $value['id'],
+                    'name' => $value['user_details'][0]['first_name'] . ' ' . $value['user_details'][0]['last_name'],
+                    'projects' => count($value['projects']),
+                    'role' => $value['roles'][0]['role']
+                ];
+            }
+        }
+        return response()->json(['data' => $data], 201);
+    }
+    /** 
+     *   For admin users only. Delete other users.
+    **/
+    public function deleteUser($id){
+        $user = User::findOrFail($id); 
+        if($user->userDetails){
+            $user->userDetails()->delete();
+        }
+        $user->roles()->detach(); 
+        $user->delete(); 
+        return response()->json(201);
     }
     /** 
      *   Generates token for authentication, returns to the user. 

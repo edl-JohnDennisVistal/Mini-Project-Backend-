@@ -25,7 +25,9 @@ class UserDetail extends Authenticatable implements JWTSubject
         'age',
         'gender',
         'address',
-        'users_id',
+        'user_id',
+        'date_of_birth',
+        'email',
     ];
 
     public function getJWTIdentifier()

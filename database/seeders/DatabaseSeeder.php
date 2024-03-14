@@ -6,6 +6,10 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
+use App\Models\User;
+use App\Models\Role;
+use App\Models\UserDetail;
+
 class DatabaseSeeder extends Seeder
 {
     /**
@@ -13,20 +17,15 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        DB::table('roles')->insert([
-            'role' => 'ROLE_ADMIN',
-            'created_at' => new \DateTime,
-            'updated_at' => new \DateTime
-        ]);
-        DB::table('roles')->insert([
-            'role' => 'ROLE_SUPERVISOR',
-            'created_at' => new \DateTime,
-            'updated_at' => new \DateTime
-        ]);
-        DB::table('roles')->insert([
-            'role' => 'ROLE_BASIC',
-            'created_at' => new \DateTime,
-            'updated_at' => new \DateTime
-        ]);
+        $adminRole = Role::factory()->create();
+        $supervisorRole = Role::factory()->supervisor()->create();
+        $basicRole = Role::factory()->basic()->create();
+        User::factory(1000)->create()->each(function ($user) use ($adminRole, $supervisorRole, $basicRole) {
+            $user->roles()->attach($adminRole);
+            $user->roles()->attach($supervisorRole);
+            $user->roles()->attach($basicRole);
+            $user->userDetails()->save(UserDetail::factory()->make());
+        });
+        
     }
 }

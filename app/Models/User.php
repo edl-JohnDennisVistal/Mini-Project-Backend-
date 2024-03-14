@@ -8,6 +8,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use App\Models\Role;
+use App\Models\userDetails;
 
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
@@ -21,10 +22,14 @@ class User extends Authenticatable implements JWTSubject
      * @var array<int, string>
      */
     protected $fillable = [
-        'username',
-        'email',
-        'password',
-        'role',
+        'username', 
+        'email', 
+        'password', 
+        'first_name', 
+        'last_name', 
+        'date_of_birth',
+        'role', 
+        'gender', 
     ];
 
     /**
@@ -43,30 +48,16 @@ class User extends Authenticatable implements JWTSubject
      * @var array<string, string>
      */
 
-    public function authorizeRoles($roles){
-        if ($this->hasAnyRole($roles)) {
-            return true;
-        }
-        abort(401, 'This action is unauthorized.');
-    }
-
-    public function hasAnyRole($roles){
-        if (is_array($roles)) {
-            foreach ($roles as $role) {
-                if ($this->hasRole($role)) {
-                    return true;
-                }
-            }
-        } else {
-            if ($this->hasRole($roles)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     public function roles(){
-        return $this->belongsToMany(Role::class, 'users_has_roles', 'users_id', 'roles_id');
+        return $this->belongsToMany(Role::class, 'users_has_roles', 'user_id', 'role_id');
+    }
+
+    public function userDetails(){
+        return $this->hasMany(userDetail::class);
+    }
+
+    public function projects(){
+        return $this->belongsToMany(Project::class, 'users_has_projects', 'user_id', 'project_id');
     }
 
     public function hasRole($role){

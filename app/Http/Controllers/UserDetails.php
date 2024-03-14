@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Http\Requests\UserDetailsValidation;
 use App\Models\UserDetail;
+use App\Models\User;
 
 /**  
  *   Docu: This class is for userDetails related processes. (Such as first name, last name, age, gender etc.)
@@ -31,5 +32,11 @@ class UserDetails extends Controller{
             return "Details updated successfully";
         }
         return "User not found";
+    }
+    public function fetchUserDetails($id){
+        $role = User::with('roles')
+            ->with('userDetails')
+            ->find($id);
+        return response()->json(['userDetails' => $role], 200);
     }
 }

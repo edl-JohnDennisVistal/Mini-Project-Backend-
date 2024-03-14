@@ -12,7 +12,8 @@ class UserDetailsValidation extends FormRequest{
             'age' => 'required|numeric|between:1,100',
             'gender' => 'required|max:10',
             'address' => 'required|max:50',
-            'users_id' => 'required|numeric',
+            'user_id' => 'required|numeric',
+            'email' => 'required|email',
         ];
     }
 }
