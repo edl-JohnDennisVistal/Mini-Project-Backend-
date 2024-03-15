@@ -9,6 +9,7 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use App\Models\Role;
 use App\Models\userDetails;
+use App\Models\Project;
 
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
@@ -50,6 +51,10 @@ class User extends Authenticatable implements JWTSubject
 
     public function roles(){
         return $this->belongsToMany(Role::class, 'users_has_roles', 'user_id', 'role_id');
+    }
+
+    public function ownedProjects() {
+        return $this->hasMany(Project::class, 'owner_id');
     }
 
     public function userDetails(){

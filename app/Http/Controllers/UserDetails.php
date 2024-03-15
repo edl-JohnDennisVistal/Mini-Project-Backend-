@@ -36,6 +36,7 @@ class UserDetails extends Controller{
     public function fetchUserDetails($id){
         $role = User::with('roles')
             ->with('userDetails')
+            ->with('projects')
             ->find($id);
         return response()->json(['userDetails' => $role], 200);
     }

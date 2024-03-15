@@ -20,8 +20,11 @@ class Projects extends Controller
     **/
     public function createProject(ProjectValidation $request){
         $validatedData = $request->validated();
-        $user = Project::create($validatedData);
-        return $user;
+        $created = Project::create($validatedData);
+        if($created){
+            return response()->json(['response' => true], 201);
+        }
+        return response()->json(['response' => false], 201);
     }
     /**  
      *   This method is used to update project.
@@ -36,5 +39,33 @@ class Projects extends Controller
             return "Updated";
         }
         return "Not Updated";
+    }
+
+    /** 
+     *   This method is used to fetch all projects.  
+    **/
+    public function fetchProjects(){
+        $data = [];
+        $projects = Project::with(['owner' => function ($query) {
+            $query->select('id');
+            $query->with(['userDetails' => function ($query) {
+                $query->select('user_id', 'first_name', 'last_name');
+            }]);
+        }])->get();
+        foreach($projects as $project){
+            $start_date = strtotime($project->start_date);
+            $end_date = strtotime($project->end_date);
+            $formattedDate1 = date("F j Y", $start_date);
+            $formattedDate2 = date("F j Y", $end_date);
+            $data[] = [
+                'id' => $project->id,
+                'name' => $project->owner['userDetails'][0]->first_name . ' ' . $project->owner['userDetails'][0]->last_name,
+                'project' => $project->project_name,
+                'start_date' => $formattedDate1,
+                'end_date' => $formattedDate2,
+                'description' => $project->description,
+            ];
+        }
+        return response()->json(['response' => $data], 201);
     }
 }

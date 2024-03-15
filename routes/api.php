@@ -27,7 +27,6 @@ use App\Http\Controllers\Skills;
 Route::post('auth/login', [Users::class,'login']);
 Route::post('auth/register', [Users::class,'register']);
 
-
 /** 
  *  Protected by JWT Authentication
 **/
@@ -48,6 +47,7 @@ Route::middleware(['auth:api'])->group(function () {
     Route::post('auth/update/skill', [Skills::class,'updateSkill'])->middleware('role:ROLE_ADMIN');   
     Route::post('auth/remove/skill', [Skills::class,'removeSkill'])->middleware('role:ROLE_ADMIN');  
     /* Projects */
+    Route::get('auth/fetch/projects', [Projects::class,'fetchProjects'])->middleware('role:ROLE_ADMIN');  
     Route::post('auth/add/project', [Projects::class,'createProject'])->middleware('role:ROLE_ADMIN');   
     Route::post('auth/update/project', [Projects::class,'updateProject'])->middleware('role:ROLE_ADMIN');  
     /* Users */
