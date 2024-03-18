@@ -31,14 +31,10 @@ class Projects extends Controller
      *   Only Admins can update projects.
      *   Returns updated project
     **/
-    public function updateProject(ProjectValidation $request){
+    public function editProject(ProjectValidation $request){
         $validatedData = $request->validated();
-        $validatedData['updated_at'] = date('Y-m-d H:i:s');
-        $user = Project::where('id', $validatedData['id'])->update($validatedData);
-        if($user){
-            return "Updated";
-        }
-        return "Not Updated";
+        $result = Project::where('id', $validatedData['id'])->update($validatedData);
+        return response()->json(['response' => $validatedData], 201);
     }
 
     /** 
@@ -78,20 +74,30 @@ class Projects extends Controller
     /** 
      *  Use for edit project. Admin privilages only.
     **/
-    public function editProject(ProjectValidation $request){
-        $validatedData = $request->validated();
-        $result = Project::where('id', $validatedData['id'])->update($validatedData);
-        return response()->json(['response' => $validatedData], 201);
-    }
-    /** 
-     *  Use for edit project. Admin privilages only.
-    **/
     public function deleteProject($id){
         $result = Project::where('id', $id)->delete();
         if($result){
             return response()->json(['response' => true], 201);
         }
         return response()->json(['response' => false], 201);
+    }
+    /** 
+     *  Use to display project members.
+    **/
+    public function projectMembers($id){
+        $members = Project::with('users.userDetails')->where('id', $id)->get();
+        return response()->json(['response' => $members], 201);
+    }
+    /** 
+     *  Add member to project. Admin privilages only. Using many to many relationship.
+    **/
+    public function addProjectMember(Request $id){
+        $user_id = $id->user_id;
+        $project_id = $id->project_id;
+        $project = Project::find($project_id);
+        $intPrj_id = intval($project_id);;
+        $project->users()->attach($user_id);
+        return response()->json([],201);
     }
 
 }
