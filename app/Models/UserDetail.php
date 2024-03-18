@@ -24,7 +24,6 @@ class UserDetail extends Authenticatable implements JWTSubject
         'last_name',
         'age',
         'gender',
-        'address',
         'user_id',
         'date_of_birth',
         'email',

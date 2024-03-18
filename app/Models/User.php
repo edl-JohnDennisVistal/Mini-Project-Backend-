@@ -10,6 +10,7 @@ use Laravel\Sanctum\HasApiTokens;
 use App\Models\Role;
 use App\Models\userDetails;
 use App\Models\Project;
+use App\Models\Skill;
 
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
@@ -63,6 +64,10 @@ class User extends Authenticatable implements JWTSubject
 
     public function projects(){
         return $this->belongsToMany(Project::class, 'users_has_projects', 'user_id', 'project_id');
+    }
+
+    public function skills(){
+        return $this->belongsToMany(Skill::class, 'users_has_skills', 'user_id', 'skill_id');
     }
 
     public function hasRole($role){

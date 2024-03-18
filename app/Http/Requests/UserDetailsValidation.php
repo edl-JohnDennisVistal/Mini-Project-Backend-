@@ -11,9 +11,9 @@ class UserDetailsValidation extends FormRequest{
             'last_name' => 'required|string|regex:/^[A-Za-z\s]+$/|max:45',
             'age' => 'required|numeric|between:1,100',
             'gender' => 'required|max:10',
-            'address' => 'required|max:50',
-            'user_id' => 'required|numeric',
             'email' => 'required|email',
+            'username' => 'required|string|max:45',
+            'password' => 'required|string|max:45'
         ];
     }
 }

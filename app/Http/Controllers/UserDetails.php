@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Http\Requests\UserDetailsValidation;
 use App\Models\UserDetail;
+use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 
 /**  
@@ -12,27 +13,29 @@ use App\Models\User;
 **/
 class UserDetails extends Controller{
     /**  
-     *   This method is used to insert user details.
-     *   Validation is done thru UserDetailsValidation.php.
-     *   Return: UserDetail object.
-    **/
-    public function insertUserDetails(UserDetailsValidation $request){
-        $validatedData = $request->validated();
-        $userDetail = UserDetail::create($validatedData);
-        return $userDetail;
-    }
-    /**  
      *   This method is used to update user details.
     **/
     public function updateUserDetails(UserDetailsValidation $request){
         $validatedData = $request->validated();
-        $validatedData['updated_at'] = date('Y-m-d H:i:s');
-        $userDetail = UserDetail::where('users_id', $validatedData['users_id'])->update($validatedData);
-        if($userDetail){
-            return "Details updated successfully";
+        $id = auth()->user()->id;
+        $userData = [
+            'username' => $validatedData['username'],
+            'password' => $validatedData['password'],
+        ];
+        $userDetailsData = [
+            'first_name' => $validatedData['first_name'],
+            'last_name' => $validatedData['last_name'],
+            'age' => $validatedData['age'],
+            'gender' => $validatedData['gender'],
+            'email' => $validatedData['email'],
+        ];
+        $user = User::find($id)->update($userData);
+        $userDetails = UserDetail::where('user_id', $id)->update($userDetailsData);
+        if($user && $userDetails){
+            return response()->json(['userDetails' => true], 200);
         }
-        return "User not found";
-    }
+        return response()->json(['userDetails' => 'Something went wrong. Please try again.'], 200);
+    } 
     public function fetchUserDetails($id){
         $role = User::with('roles')
             ->with('userDetails')

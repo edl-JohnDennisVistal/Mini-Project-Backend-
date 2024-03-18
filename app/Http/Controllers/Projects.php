@@ -68,4 +68,30 @@ class Projects extends Controller
         }
         return response()->json(['response' => $data], 201);
     }
+    /** 
+     *  Use for fetching project's member. This is a many to many, Users and projects.
+    **/
+    public function fetchProjectUsers($id){
+        $projects = Project::with('users.userDetails')->where('id', $id)->get();
+        return response()->json(['response' => $projects], 201);
+    }
+    /** 
+     *  Use for edit project. Admin privilages only.
+    **/
+    public function editProject(ProjectValidation $request){
+        $validatedData = $request->validated();
+        $result = Project::where('id', $validatedData['id'])->update($validatedData);
+        return response()->json(['response' => $validatedData], 201);
+    }
+    /** 
+     *  Use for edit project. Admin privilages only.
+    **/
+    public function deleteProject($id){
+        $result = Project::where('id', $id)->delete();
+        if($result){
+            return response()->json(['response' => true], 201);
+        }
+        return response()->json(['response' => false], 201);
+    }
+
 }

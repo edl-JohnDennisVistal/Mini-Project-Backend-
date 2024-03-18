@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Http\Requests\RegistrationValidation;
 use App\Http\Requests\UserDetailsValidation;
@@ -31,7 +31,7 @@ class Users extends Controller{
             'first_name' => $validatedData['first_name'],
             'last_name' => $validatedData['last_name'],
             'date_of_birth' => date("F d, Y", strtotime($validatedData['date_of_birth'])),
-            'gender' => $validatedData['gender'],
+            'gender' => ucfirst($validatedData['gender']),
             'email' => $validatedData['email'],
             'age' => $validatedData['age'],   
         ]);
@@ -90,7 +90,8 @@ class Users extends Controller{
     /** 
      *   For admin users only.
     **/
-    public function fetchUsers($id){
+    public function fetchAllUsersData(){
+        $id = auth()->user()->id;
         $users = User::where('id', '!=', $id)->with('userDetails', 'roles', 'projects')->get()->toArray();
         $data = [];
         if( isset($users) && !empty($users) ){
@@ -118,6 +119,28 @@ class Users extends Controller{
         return response()->json(201);
     }
     /** 
+     *   For self update. No need to pass id for security.
+    **/
+    public function selfDetails(){
+        $id = auth()->user()->id;
+        $users = User::with(['userDetails', 'roles' => function ($query) use ($id) {
+            $query->where('user_id', $id);
+        }, 'projects'])->find($id);        
+        return response()->json(['data' => $users], 201);
+    }
+    /** 
+     *  Add skill to users
+    **/
+    public function addSkill(Request $request){
+        $user = auth()->user(); 
+        $skill_id = intval($request->skill);;
+        $user->skills()->attach($skill_id);
+        if(!$user){
+            return response()->json(['response' => false], 201);
+        }
+        return response()->json(['response' => $skill_id], 201);
+    }
+    /** 
      *   Generates token for authentication, returns to the user. 
     **/
     protected function respondWithToken($token){
@@ -127,5 +150,4 @@ class Users extends Controller{
             'expires_in'   => auth('api')->factory()->getTTL() * 60
         ]);
     }
-    
 }

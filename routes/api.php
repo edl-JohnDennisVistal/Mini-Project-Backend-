@@ -29,16 +29,21 @@ Route::post('auth/register', [Users::class,'register']);
 
 /** 
  *  Protected by JWT Authentication
-**/
+ **/
 Route::middleware(['auth:api'])->group(function () {
     /** 
      *  Users priveleges. Modefy their own details and skills
-    **/
+     **/
     Route::post('auth/update/registered/data', [Users::class,'updateRegistration']);    
     Route::post('auth/add/user/details', [UserDetails::class,'insertUserDetails']);               
-    Route::post('auth/update/user/details', [UserDetails::class,'updateUserDetails']);  
+    Route::put('auth/update/user/details', [UserDetails::class,'updateUserDetails']);  
     Route::get('auth/user/details/{id}', [UserDetails::class,'fetchUserDetails']); 
+    Route::get('auth/profile/self', [Users::class,'selfDetails']); 
+    Route::post('auth/skill/add', [Users::class,'addSkill']);
     Route::get('auth/logout', [Users::class,'logout']);     
+    /* Skills */
+    Route::get('auth/skills', [Skills::class,'fetchSkills']);
+    Route::get('auth/user/skills/{id}', [Skills::class,'getUserSkills']);
     /** 
      *  Admin rights
      **/
@@ -50,7 +55,11 @@ Route::middleware(['auth:api'])->group(function () {
     Route::get('auth/fetch/projects', [Projects::class,'fetchProjects'])->middleware('role:ROLE_ADMIN');  
     Route::post('auth/add/project', [Projects::class,'createProject'])->middleware('role:ROLE_ADMIN');   
     Route::post('auth/update/project', [Projects::class,'updateProject'])->middleware('role:ROLE_ADMIN');  
+    Route::get('auth/fetch/project/user/{id}', [Projects::class,'fetchProjectUsers'])->middleware('role:ROLE_ADMIN');  
+    Route::put('auth/edit/project', [Projects::class,'editProject'])->middleware('role:ROLE_ADMIN');  
+    Route::delete('/auth/project/delete/{id}', [Projects::class,'deleteProject'])->middleware('role:ROLE_ADMIN');  
     /* Users */
-    Route::get('auth/admin-panel/{id}', [Users::class,'fetchUsers'])->middleware('role:ROLE_ADMIN');  
-    Route::get('auth/admin-panel/delete/{id}', [Users::class,'deleteUser'])->middleware('role:ROLE_ADMIN');  
+    Route::get('auth/admin/panel', [Users::class,'fetchAllUsersData'])->middleware('role:ROLE_ADMIN');  
+    Route::get('auth/admin/panel/delete/{id}', [Users::class,'deleteUser'])->middleware('role:ROLE_ADMIN');  
 });
+    

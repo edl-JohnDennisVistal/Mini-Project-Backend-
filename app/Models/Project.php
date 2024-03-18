@@ -20,7 +20,7 @@ class Project extends Model
     ];
 
     public function users() {
-        return $this->belongsToMany(User::class);
+        return $this->belongsToMany(User::class, 'users_has_projects', 'user_id', 'project_id');
     }
 
     public function owner() {
