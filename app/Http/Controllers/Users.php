@@ -80,13 +80,8 @@ class Users extends Controller{
     **/
     public function logout(Request $request){        
         auth('api')->logout();
-        return response()->json([
-            'message' => 'Successfully logged out'
-        ]);
+        return response()->json(['response' => true]);
     }  
-    public function insertUserDetails(UserDetailsValidation $request){
-        
-    }
     /** 
      *   For admin users only.
     **/
@@ -111,10 +106,10 @@ class Users extends Controller{
     **/
     public function deleteUser($id){
         $user = User::findOrFail($id); 
-        if($user->userDetails){
-            $user->userDetails()->delete();
-        }
+        $user->userDetails()->delete();
         $user->roles()->detach(); 
+        $user->projects()->detach();
+        $user->skills()->detach();
         $user->delete(); 
         return response()->json(201);
     }
@@ -129,7 +124,7 @@ class Users extends Controller{
         return response()->json(['data' => $users], 201);
     }
     /** 
-     *  Add skill to users
+     *  Add skill to users. Can be access all users.
     **/
     public function addSkill(Request $request){
         $user = auth()->user(); 
@@ -138,7 +133,52 @@ class Users extends Controller{
         if(!$user){
             return response()->json(['response' => false], 201);
         }
-        return response()->json(['response' => $skill_id], 201);
+        return response()->json(['response' => true], 201);
+    }
+    /** 
+     *  Delete skill to users. Can be access all users.
+    **/
+    public function deleteSkill($id){
+        $user = auth()->user(); 
+        $skill_id = intval($id);
+        $user->skills()->detach($skill_id);
+        if(!$user){
+            return response()->json(['response' => false], 201);
+        }
+        return response()->json(['response' => true], 201);
+    }
+    /** 
+     *  Should return a boolean value if user has a valid token. Yup, this is auth based.
+    **/
+    public function loggedIn(){
+        if(auth()->check()){
+            return response()->json(['response' => true], 201);
+        }
+        return response()->json(['response' => false], 201);
+    }
+    /** 
+     *   For home component displays name
+    **/
+    public function getMyName(){
+        $user = auth()->user();
+        $userDetails = $user->userDetails; 
+        if ($userDetails) {
+            $firstName = $userDetails[0]->first_name;
+            $lastName = $userDetails[0]->last_name;
+            $id = $userDetails[0]->id;
+            return response()->json([ 'id' => $id, 'name' => $firstName . ' ' . $lastName], 201);
+        }
+        return null;
+    }
+    /** 
+     *  Should return true or false. This is for front end route guard. Admin privileges only.
+    **/
+    public function checkAdmin(){
+        $user = auth()->user();
+        if($user->hasRole('ROLE_ADMIN')){
+            return response()->json(['response' => true], 201);
+        }
+        return response()->json(['response' => false], 201);
     }
     /** 
      *   Generates token for authentication, returns to the user. 

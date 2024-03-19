@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Project;
+use App\Models\User;
 use App\Http\Requests\ProjectValidation;
 use Illuminate\Http\Request;
 
@@ -75,7 +76,9 @@ class Projects extends Controller
      *  Use for edit project. Admin privilages only.
     **/
     public function deleteProject($id){
-        $result = Project::where('id', $id)->delete();
+        $result = Project::find($id);
+        $result->users()->detach();
+        $result->delete();
         if($result){
             return response()->json(['response' => true], 201);
         }
@@ -98,6 +101,18 @@ class Projects extends Controller
         $intPrj_id = intval($project_id);;
         $project->users()->attach($user_id);
         return response()->json([],201);
+    }
+
+    public function projectDetails($id){
+        $project = Project::find($id);
+        $description = $project->description;
+        return response()->json($description, 201);
+    }
+
+    public function deleteProjectMember($id){
+        $user = User::find($id);
+        $user->projects()->detach();
+        return response()->json(201);
     }
 
 }

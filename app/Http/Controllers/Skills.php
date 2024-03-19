@@ -15,9 +15,11 @@ use App\Models\User;
 class Skills extends Controller
 {
 
-    public function fetchSkills(){
-        $skills = Skill::all();
-        return response()->json(['response' => $skills], 201);
+    public function fetchSkills($id){
+        $user = User::find($id);
+        $skillsUserHas = $user->skills()->pluck('id');
+        $skillsUserDoesNotHave = Skill::whereNotIn('id', $skillsUserHas)->get();
+        return response()->json(['response' => $skillsUserDoesNotHave], 201);
     }
 
     public function getUserSkills($id){
