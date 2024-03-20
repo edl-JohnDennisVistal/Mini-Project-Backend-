@@ -69,9 +69,15 @@ class Users extends Controller{
                 'message' => 'Invalid username or password'
             ],401);
         }
+        $user = auth('api')->user()->roles;
+        $data = [
+            'id' => auth('api')->user()->id,
+            'role' => $user[0]->role,
+            'username' => auth('api')->user()->username
+        ];
         return $this->respondWithToken([
             'token' => $token,
-            'user' => auth('api')->user()
+            'user' => $data
         ]);
     }
     /**  
@@ -148,15 +154,6 @@ class Users extends Controller{
         return response()->json(['response' => true], 201);
     }
     /** 
-     *  Should return a boolean value if user has a valid token. Yup, this is auth based.
-    **/
-    public function loggedIn(){
-        if(auth()->check()){
-            return response()->json(['response' => true], 201);
-        }
-        return response()->json(['response' => false], 201);
-    }
-    /** 
      *   For home component displays name
     **/
     public function getMyName(){
@@ -171,14 +168,24 @@ class Users extends Controller{
         return null;
     }
     /** 
-     *  Should return true or false. This is for front end route guard. Admin privileges only.
+     *   When app is restarted, this will check for user authentication.
     **/
-    public function checkAdmin(){
-        $user = auth()->user();
-        if($user->hasRole('ROLE_ADMIN')){
-            return response()->json(['response' => true], 201);
-        }
-        return response()->json(['response' => false], 201);
+    public function checkAuth(){
+        $user = auth('api')->user()->roles;
+        $data = [
+            'id' => auth('api')->user()->id,
+            'role' => $user[0]->role,
+            'username' => auth('api')->user()->username
+        ];
+
+
+        $user = auth('api')->user()->roles;
+        $data = [
+            'id' => auth('api')->user()->id,
+            'role' => $user[0]->role,
+            'username' => auth('api')->user()->username
+        ];
+        return response()->json(['access_token' => ['user' => $data]], 201);
     }
     /** 
      *   Generates token for authentication, returns to the user. 

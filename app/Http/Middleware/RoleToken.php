@@ -17,7 +17,7 @@ class RoleToken
     {
         if (! $request->user()->hasRole($role)) {
             return response()->json([
-                'message' => 'Unauthenticated'
+                'message' => $request->user()->hasRole($role)
             ],401);
         }
         return $next($request);

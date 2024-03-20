@@ -70,11 +70,19 @@ class User extends Authenticatable implements JWTSubject
         return $this->belongsToMany(Skill::class, 'users_has_skills', 'user_id', 'skill_id');
     }
 
-    public function hasRole($role){
-        if ($this->roles()->where('role', $role)->first()) {
-            return true;
+    public function hasRole($roles){
+        return $roles;
+        if (is_array($roles)) {
+            foreach ($roles as $role) {
+                if ($this->roles()->where('role', $role)->first()) {
+                    return true;
+                }
+            }
+            return false;
+        } 
+        else {
+            return $this->roles()->where('role', $roles)->exists();
         }
-        return false;
     }
 
     protected $casts = [

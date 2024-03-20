@@ -44,32 +44,28 @@ Route::middleware(['auth:api'])->group(function () {
     Route::get('auth/logout', [Users::class,'logout']); 
     Route::get('auth/name', [Users::class,'getMyName']);    
     Route::get('auth/project/description/{id}', [Projects::class,'projectDetails']);  
-    /** 
-     *  User log status
-    **/
-    Route::get('auth/status/checker', [Users::class,'loggedIn']);     
+    /* For checking if user is logged in and also previlages */
+    Route::get('auth/check', [Users::class,'checkAuth']);
     /* Skills */
     Route::get('auth/skills/{id}', [Skills::class,'fetchSkills']);
     Route::get('auth/user/skills/{id}', [Skills::class,'getUserSkills']);
     /** 
-     *  Admin rights
+     *  Admin rights. SUPERVISOR can only access the get.
      **/
     /* Skills */
     Route::post('auth/update/skill', [Skills::class,'updateSkill'])->middleware('role:ROLE_ADMIN');   
     Route::post('auth/remove/skill', [Skills::class,'removeSkill'])->middleware('role:ROLE_ADMIN');  
     /* Projects */
-    Route::get('auth/fetch/projects', [Projects::class,'fetchProjects'])->middleware('role:ROLE_ADMIN');  
-    Route::post('auth/add/project', [Projects::class,'createProject'])->middleware('role:ROLE_ADMIN');    
-    Route::get('auth/fetch/project/user/{id}', [Projects::class,'fetchProjectUsers'])->middleware('role:ROLE_ADMIN');  
     Route::put('auth/edit/project', [Projects::class,'editProject'])->middleware('role:ROLE_ADMIN');  
+    Route::post('auth/add/project', [Projects::class,'createProject'])->middleware('role:ROLE_ADMIN');    
     Route::delete('auth/project/delete/{id}', [Projects::class,'deleteProject'])->middleware('role:ROLE_ADMIN');  
-    Route::get('auth/project/members/{id}', [Projects::class,'projectMembers'])->middleware('role:ROLE_ADMIN');  
     Route::post('auth/project/members/add', [Projects::class,'addProjectMember'])->middleware('role:ROLE_ADMIN');  
     Route::delete('auth/project/members/delete/{id}', [Projects::class,'deleteProjectMember'])->middleware('role:ROLE_ADMIN');  
+    Route::get('auth/fetch/projects', [Projects::class,'fetchProjects'])->middleware('role:ROLE_ADMIN'); 
+    Route::get('auth/project/members/{id}', [Projects::class,'projectMembers'])->middleware('role:ROLE_ADMIN'); 
+    Route::get('auth/fetch/project/user/{id}', [Projects::class,'fetchProjectUsers'])->middleware('role:ROLE_ADMIN'); 
     /* Users */
-    Route::get('auth/admin/panel', [Users::class,'fetchAllUsersData'])->middleware('role:ROLE_ADMIN');  
+    Route::get('auth/admin/panel', [Users::class,'fetchAllUsersData'])->middleware('auth:api')->middleware('role:ROLE_ADMIN'); 
     Route::delete('auth/admin/panel/delete/{id}', [Users::class,'deleteUser'])->middleware('role:ROLE_ADMIN');  
-    /* Checks if user is admin */
-    Route::get('auth/check/admin', [Users::class,'checkAdmin'])->middleware('role:ROLE_ADMIN');
 });
     

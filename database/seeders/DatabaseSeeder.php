@@ -30,9 +30,7 @@ class DatabaseSeeder extends Seeder
         $adminRole = Role::factory()->create();
         $supervisorRole = Role::factory()->supervisor()->create();
         $basicRole = Role::factory()->basic()->create();
-        User::factory(50)->create()->each(function ($user) use ($adminRole, $supervisorRole, $basicRole) {
-            $user->roles()->attach($adminRole);
-            $user->roles()->attach($supervisorRole);
+        User::factory(5)->create()->each(function ($user) use ($adminRole, $supervisorRole, $basicRole) {
             $user->roles()->attach($basicRole);
             $user->userDetails()->save(UserDetail::factory()->make());
         });

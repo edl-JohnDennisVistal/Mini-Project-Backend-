@@ -8,7 +8,6 @@ class ProjectValidation extends FormRequest{
     public function rules(){
         return [
             'id' => '',
-            'user_id' => 'required',
             'project_name' => 'required|string|max:50',
             'start_date' => 'required',
             'end_date' => 'required',

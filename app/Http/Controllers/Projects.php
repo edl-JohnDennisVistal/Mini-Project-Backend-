@@ -21,6 +21,7 @@ class Projects extends Controller
     **/
     public function createProject(ProjectValidation $request){
         $validatedData = $request->validated();
+        $validatedData['user_id'] = auth()->id();
         $created = Project::create($validatedData);
         if($created){
             return response()->json(['response' => true], 201);
