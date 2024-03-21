@@ -13,13 +13,18 @@ class RoleToken
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
-    public function handle(Request $request, Closure $next, $role)
+    public function handle(Request $request, Closure $next, $role1, $role2)
     {
-        if (! $request->user()->hasRole($role)) {
+        if (Auth::check() && (Auth::user()->hasRole($role1) || Auth::user()->hasRole($role2))) {
+            return $next($request);
+        }
+
+        /* return abort(403, 'Unauthorized action.');
+        if (! $request->user()->hasRole($role)) { */
             return response()->json([
                 'message' => $request->user()->hasRole($role)
             ],401);
-        }
-        return $next($request);
+        /* }
+        return $next($request); */
     }
 }
