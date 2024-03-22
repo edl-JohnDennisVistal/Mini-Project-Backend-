@@ -71,7 +71,6 @@ class User extends Authenticatable implements JWTSubject
     }
 
     public function hasRole($roles){
-        return $roles;
         if (is_array($roles)) {
             foreach ($roles as $role) {
                 if ($this->roles()->where('role', $role)->first()) {

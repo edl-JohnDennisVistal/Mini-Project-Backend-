@@ -19,11 +19,8 @@ class RoleToken
         if (!Auth::check()) {
             return redirect()->route('login');
         }
-
-        foreach ($roles as $role) {
-            if (Auth::user()->hasRole($role)) {
-                return $next($request);
-            }
+        if (Auth::user()->hasRole($roles)) {
+            return $next($request);
         }
 
         return abort(403, 'Unauthorized action.');
