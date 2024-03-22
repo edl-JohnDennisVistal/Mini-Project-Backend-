@@ -61,11 +61,11 @@ Route::middleware(['auth:api'])->group(function () {
     Route::delete('auth/project/delete/{id}', [Projects::class,'deleteProject'])->middleware('role:ROLE_ADMIN');  
     Route::post('auth/project/members/add', [Projects::class,'addProjectMember'])->middleware('role:ROLE_ADMIN');  
     Route::delete('auth/project/members/delete/{id}', [Projects::class,'deleteProjectMember'])->middleware('role:ROLE_ADMIN');  
-    Route::get('auth/fetch/projects', [Projects::class,'fetchProjects'])->middleware('role:ROLE_ADMIN'); 
-    Route::get('auth/project/members/{id}', [Projects::class,'projectMembers'])->middleware('role:ROLE_ADMIN'); 
-    Route::get('auth/fetch/project/user/{id}', [Projects::class,'fetchProjectUsers'])->middleware('role:ROLE_ADMIN'); 
+    Route::get('auth/fetch/projects', [Projects::class,'fetchProjects'])->middleware('role:ROLE_ADMIN,ROLE_SUPERVISOR'); 
+    Route::get('auth/project/members/{id}', [Projects::class,'projectMembers'])->middleware('role:ROLE_ADMIN,ROLE_SUPERVISOR'); 
+    Route::get('auth/fetch/project/user/{id}', [Projects::class,'fetchProjectUsers'])->middleware('role:ROLE_ADMIN,ROLE_SUPERVISOR'); 
     /* Users */
-    Route::get('auth/admin/panel', [Users::class,'fetchAllUsersData'])->middleware('auth:api')->middleware('role:ROLE_ADMIN'); 
+    Route::get('auth/admin/panel', [Users::class,'fetchAllUsersData'])->middleware('auth:api')->middleware('role:ROLE_ADMIN,ROLE_SUPERVISOR'); 
     Route::delete('auth/admin/panel/delete/{id}', [Users::class,'deleteUser'])->middleware('role:ROLE_ADMIN');  
 });
     
